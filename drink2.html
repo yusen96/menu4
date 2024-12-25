@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萬波島嶼紅茶</title>
+    <style>
+        /* Modal styles */
+        .modal-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4a3728;
+        }
+
+        .delete-item {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            color: #997b66;
+            cursor: pointer;
+        }
+
+        .size-controls {
+            margin: 10px 0;
+        }
+
+        .topping-group {
+            margin: 10px 0;
+        }
+
+        .topping-header {
+            font-size: 0.9em;
+            color: #8b5e3c;
+            margin-bottom: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e8d5c4;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #8b5e3c;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #e8d5c4;
+            padding: 15px 0;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #4a3728;
+        }
+
+        .cart-item-price {
+            color: #8b5e3c;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .quantity-btn {
+            background: white;
+            border: 1px solid #8b5e3c;
+            color: #8b5e3c;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .customization-select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #e8d5c4;
+            border-radius: 4px;
+            background-color: #fff9f3;
+        }
+
+        .topping-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .topping-option {
+            background: white;
+            border: 1px solid #8b5e3c;
+            color: #8b5e3c;
+            padding: 4px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .topping-option.selected {
+            background: #8b5e3c;
+            color: white;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e8d5c4;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #4a3728;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #8b5e3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .checkout-btn:hover {
+            background: #734c31;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微軟正黑體", sans-serif;
+        }
+
+        body {
+            background-color: #f9f3e9;
+            padding: 20px;
+            color: #4a3728;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8b5e3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #8b5e3c;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+            border: 1px solid #e8d5c4;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            background-color: #8b5e3c;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-description {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0e6db;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .english-name {
+            font-size: 0.8em;
+            color: #997b66;
+        }
+
+        .price {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tag {
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: white;
+            background-color: #c9a063;
+            margin-left: 8px;
+        }
+
+        .footer-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f1e7;
+            border-radius: 8px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            color: #8b5e3c;
+            margin-bottom: 10px;
+        }
+
+        .info-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-item {
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #997b66;
+        }
+
+        .cart-btn {
+            position: relative;
+            background: white;
+            border: 1px solid #8b5e3c;
+            color: #8b5e3c;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .add-to-cart {
+            background: white;
+            border: 1px solid #8b5e3c;
+            color: #8b5e3c;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .add-to-cart:hover {
+            background: #8b5e3c;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .menu-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .price {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">萬波島嶼紅茶</div>
+            <button class="cart-btn" id="cartBtn">
+                <span>🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </header>
+
+        <!-- 品茗精選 -->
+        <div class="menu-section">
+            <div class="section-title">
+                品茗精選
+                <span class="section-description">精選特色茶品</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    島嶼紅茶
+                    <span class="english-name">Island Black Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $25 / L $30</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    普通紅茶
+                    <span class="english-name">Normal Black Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $25 / L $30</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    宜蘭綠茶
+                    <span class="english-name">Xuanqiao Green Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $25 / L $30</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    麗雅烏龍
+                    <span class="english-name">Golden Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $30 / L $35</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金萱青茶
+                    <span class="english-name">Jinxuan Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $30 / L $35</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    烏龍鐵觀音
+                    <span class="english-name">Tieguanyin Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $25 / L $30</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 手路調飲 -->
+        <div class="menu-section">
+            <div class="section-title">
+                手路調飲
+                <span class="section-description">特調系列</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    蜂蜜金萱/麗雅
+                    <span class="english-name">Honey Jinxuan/Golden Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金萱珍波粉
+                    <span class="english-name">Boba Pearl Jelly Jinxuan Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金牌愛玉檸檬
+                    <span class="english-name">Aiyu Jelly Lemon Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $50 / L $60</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    杏花雨露
+                    <span class="english-name">Apricot Kernel Tofu Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 醇濃奶香 -->
+        <div class="menu-section">
+            <div class="section-title">
+                醇濃奶香
+                <span class="section-description">奶茶系列</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    萬波奶茶
+                    <span class="english-name">Wanpo Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    普通奶茶
+                    <span class="english-name">Normal Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    芋圓茉香奶綠
+                    <span class="english-name">Taro Ball Green Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $50 / L $60</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    鐵觀音奶茶
+                    <span class="english-name">Oolong Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    波霸奶茶
+                    <span class="english-name">Boba Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $50 / L $60</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    宜蘭奶綠
+                    <span class="english-name">Xuanqiao Green Milk Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 永良老頭家 -->
+        <div class="menu-section">
+            <div class="section-title">
+                永良老頭家
+                <span class="section-description">冬瓜系列</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    永良冬瓜露
+                    <span class="english-name">Winter Melon Punch</span>
+                </div>
+                <div class="price">
+                    <span>M $25 / L $35</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    冬瓜金萱青
+                    <span class="english-name">Winter Melon Jinxuan Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $30 / L $40</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    冬瓜鮮奶
+                    <span class="english-name">Winter Melon Milk</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $55</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    冬瓜檸檬
+                    <span class="english-name">Winter Melon Lemonade</span>
+                </div>
+                <div class="price">
+                    <span>M $40 / L $50</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 鮮茶果香 -->
+        <div class="menu-section">
+            <div class="section-title">
+                鮮茶果香
+                <span class="section-description">特色茶飲</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    島嶼檸檬茶王
+                    <span class="english-name">Lemon Iced Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $55</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    白柚烏龍/翡翠/金萱
+                    <span class="english-name">Honey Lemon Pomelo Oolong/Green Tea/Jinxuan</span>
+                </div>
+                <div class="price">
+                    <span>M $65 / L $75</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    紅蘋島嶼
+                    <span class="english-name">Apple Iced Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $50 / L $60</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    埔里甘蔗青
+                    <span class="english-name">Sugar Cane Jinxuan Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $50 / L $60</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    翠涼香檸綠
+                    <span class="english-name">Lemon Green Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $55</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    大青梅果綠
+                    <span class="english-name">Plum Green Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $55</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    旅香煙燻烏梅
+                    <span class="english-name">Smoked Plum Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $45 / L $55</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    甘蔗檸檬
+                    <span class="english-name">Sugar Cane Lemonade</span>
+                </div>
+                <div class="price">
+                    <span>M $55 / L $65</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 冬季限定 -->
+        <div class="menu-section">
+            <div class="section-title">
+                冬季限定
+                <span class="section-description">季節限定</span>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    芋頭鮮奶
+                    <span class="english-name">Taro Milk</span>
+                    <span class="tag">限定</span>
+                </div>
+                <div class="price">
+                    <span>M $70 / L $80</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    芋頭波霸鮮奶
+                    <span class="english-name">Boba Taro Milk</span>
+                    <span class="tag">限定</span>
+                </div>
+                <div class="price">
+                    <span>M $75 / L $85</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    芋芋三混圓
+                    <span class="english-name">Tapioca Feast Taro Milk</span>
+                    <span class="tag">限定</span>
+                </div>
+                <div class="price">
+                    <span>M $75 / L $85</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    春橙翡翠/烏龍
+                    <span class="english-name">Orange Green Tea/Golden Oolong</span>
+                </div>
+                <div class="price">
+                    <span>M $65 / L $75</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    春橙愛玉
+                    <span class="english-name">Aiyu Orange Green Tea</span>
+                </div>
+                <div class="price">
+                    <span>M $65 / L $75</span>
+                    <button class="cart-btn">加入購物車</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客製化選項 -->
+        <div class="footer-info">
+            <div class="info-section">
+                <div class="info-title">加料選擇</div>
+                <div class="info-content">
+                    <div class="info-item">+$10：愛玉凍 | 芋圓 | 波霸 | 小珍珠 | 杏仁凍</div>
+                    <div class="info-item">+$15：粉條 | 珍波粉 | 紅白小湯圓 | 煙燻烏梅奶</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">甜度選擇</div>
+                <div class="info-content">
+                    <div class="info-item">正常糖 | 少糖 | 半糖 | 微糖 | 微微糖 | 無糖</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">冰量選擇</div>
+                <div class="info-content">
+                    <div class="info-item">正常冰 | 少冰 | 微冰 | 去冰 | 溫熱</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="modal" id="cartModal">
+        <div class="modal-header">
+            <h2>購物車</h2>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <span>總計</span>
+            <span id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" onclick="copyOrder()">結帳</button>
+    </div>
+
+    <script>
+        function copyOrder() {
+    const items = cart.items;
+    const now = new Date();
+    const orderTime = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    let orderText = `=== 萬波訂單 ===\n訂購時間：${orderTime}\n------------------\n`;
+
+    items.forEach((item, index) => {
+        const total = cart.calculateItemTotal(item);
+        orderText += `${index + 1}. ${item.name}\n`;
+        orderText += `   數量：${item.size}杯 x ${item.quantity}\n`;
+        orderText += `   甜度：${item.customizations.sugar}\n`;
+        orderText += `   冰塊：${item.customizations.ice}\n`;
+
+        if (item.customizations.toppings.length > 0) {
+            orderText += `   加料：${item.customizations.toppings.join('、')}\n`;
+        }
+        
+        orderText += `   小計：$${total}\n------------------\n`;
+    });
+
+    orderText += `總計金額：$${cart.calculateTotal()}\n`;
+
+    // Create a temporary textarea to copy text
+    const textarea = document.createElement('textarea');
+    textarea.value = orderText;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    // Show copied message
+    alert('訂單已複製到剪貼簿！');
+}
+
+        class ShoppingCart {
+            constructor() {
+                this.items = [];
+                this.init();
+            }
+
+            init() {
+                document.querySelectorAll('.cart-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        const name = menuItem.querySelector('.item-name').firstChild.textContent.trim();
+        const priceText = menuItem.querySelector('.price span').textContent;
+        const [mPrice, lPrice] = priceText.match(/\d+/g).map(Number);
+        this.addItem({ name, priceM: mPrice, priceL: lPrice });
+    });
+});
+
+
+                document.getElementById('cartBtn').addEventListener('click', () => this.openCart());
+                document.getElementById('closeModal').addEventListener('click', () => this.closeCart());
+                document.getElementById('overlay').addEventListener('click', () => this.closeCart());
+            }
+
+            addItem(item) {
+                const newItem = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    ...item,
+                    size: 'M',
+                    quantity: 1,
+                    customizations: {
+                        sugar: '正常糖',
+                        ice: '正常冰',
+                        toppings: []
+                    }
+                };
+                this.items.push(newItem);
+                this.updateCart();
+            }
+updateCart() {
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = this.items.map(item => this.renderCartItem(item)).join('');
+
+    // 更新右上角購物車計數器
+    document.getElementById('cartCount').textContent = this.items.length;
+
+    // 更新購物車總金額
+    document.getElementById('cartTotal').textContent = `$${this.calculateTotal()}`;
+
+    // 綁定事件
+    this.addCartItemListeners();
+}
+            removeItem(id) {
+                this.items = this.items.filter(item => item.id !== id);
+                this.updateCart();
+            }
+
+            updateQuantity(id, delta) {
+                const item = this.items.find(item => item.id === id);
+                if (item) {
+                    item.quantity = Math.max(1, item.quantity + delta);
+                    this.updateCart();
+                }
+            }
+
+            updateSize(id, size) {
+                const item = this.items.find(item => item.id === id);
+                if (item) {
+                    item.size = size;
+                    this.updateCart();
+                }
+            }
+
+            updateCustomization(id, type, value) {
+                const item = this.items.find(item => item.id === id);
+                if (item) {
+                    item.customizations[type] = value;
+                    this.updateCart();
+                }
+            }
+
+            toggleTopping(id, topping) {
+                const item = this.items.find(item => item.id === id);
+                if (item) {
+                    const toppings = item.customizations.toppings;
+                    const index = toppings.indexOf(topping);
+                    if (index === -1) {
+                        toppings.push(topping);
+                    } else {
+                        toppings.splice(index, 1);
+                    }
+                    this.updateCart();
+                }
+            }
+
+            calculateItemTotal(item) {
+                const basePrice = item.size === 'M' ? item.priceM : item.priceL;
+                let total = basePrice * item.quantity;
+                
+                item.customizations.toppings.forEach(topping => {
+                    const toppingPrice = ['愛玉凍', '芋圓', '波霸', '小珍珠', '杏仁凍'].includes(topping) ? 10 : 15;
+                    total += toppingPrice * item.quantity;
+                });
+                
+                return total;
+            }
+
+            calculateTotal() {
+                return this.items.reduce((sum, item) => sum + this.calculateItemTotal(item), 0);
+            }
+
+      
+            renderCartItem(item) {
+                return `
+                    <div class="cart-item" data-id="${item.id}">
+                        <div class="cart-item-header">
+                            <span class="cart-item-name">${item.name}</span>
+                            <button class="delete-item">&times;</button>
+                        </div>
+                        <div class="cart-item-price">${this.calculateItemTotal(item)}</div>
+                        
+                        <div class="size-controls">
+                            <select class="customization-select size-select">
+                                <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
+                                <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
+                            </select>
+                        </div>
+
+                        <div class="quantity-controls">
+                            <button class="quantity-btn decrease">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn increase">+</button>
+                        </div>
+
+                        <select class="customization-select sugar-select">
+                            ${['正常糖', '少糖', '半糖', '微糖', '微微糖', '無糖']
+                                .map(sugar => `<option value="${sugar}" ${item.customizations.sugar === sugar ? 'selected' : ''}>${sugar}</option>`)
+                                .join('')}
+                        </select>
+
+                        <select class="customization-select ice-select">
+                            ${['正常冰', '少冰', '微冰', '去冰', '溫熱']
+                                .map(ice => `<option value="${ice}" ${item.customizations.ice === ice ? 'selected' : ''}>${ice}</option>`)
+                                .join('')}
+                        </select>
+
+                        <div class="topping-options">
+                            <div class="topping-group">
+                                <div class="topping-header">加料 $10：</div>
+                                ${['愛玉凍', '芋圓', '波霸', '小珍珠', '杏仁凍']
+                                    .map(topping => `
+                                        <span class="topping-option ${item.customizations.toppings.includes(topping) ? 'selected' : ''}" 
+                                              data-topping="${topping}">
+                                            ${topping}
+                                        </span>
+                                    `).join('')}
+                            </div>
+                            <div class="topping-group">
+                                <div class="topping-header">加料 $15：</div>
+                                ${['粉條', '珍波粉', '紅白小湯圓', '煙燻烏梅奶']
+                                    .map(topping => `
+                                        <span class="topping-option ${item.customizations.toppings.includes(topping) ? 'selected' : ''}" 
+                                              data-topping="${topping}">
+                                            ${topping}
+                                        </span>
+                                    `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            addCartItemListeners() {
+                document.querySelectorAll('.delete-item').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        this.removeItem(id);
+                    });
+                });
+
+                document.querySelectorAll('.size-select').forEach(select => {
+                    select.addEventListener('change', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        this.updateSize(id, e.target.value);
+                    });
+                });
+
+                document.querySelectorAll('.quantity-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        const delta = e.target.classList.contains('increase') ? 1 : -1;
+                        this.updateQuantity(id, delta);
+                    });
+                });
+
+                document.querySelectorAll('.sugar-select').forEach(select => {
+                    select.addEventListener('change', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        this.updateCustomization(id, 'sugar', e.target.value);
+                    });
+                });
+
+                document.querySelectorAll('.ice-select').forEach(select => {
+                    select.addEventListener('change', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        this.updateCustomization(id, 'ice', e.target.value);
+                    });
+                });
+
+                document.querySelectorAll('.topping-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const id = e.target.closest('.cart-item').dataset.id;
+                        const topping = e.target.dataset.topping;
+                        this.toggleTopping(id, topping);
+                    });
+                });
+            }
+
+            openCart() {
+                document.getElementById('cartModal').classList.add('show');
+                document.getElementById('overlay').classList.add('show');
+            }
+
+            closeCart() {
+                document.getElementById('cartModal').classList.remove('show');
+                document.getElementById('overlay').classList.remove('show');
+            }
+        }
+
+        // Initialize shopping cart
+        const cart = new ShoppingCart();
+    </script>
+</body>
+</html>
