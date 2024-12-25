@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶湯會菜單</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微軟正黑體", sans-serif;
+        }
+
+        body {
+            background-color: #fdf6e9;
+            padding: 20px;
+            color: #5c4033;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8d5c4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3c2f2f;
+        }
+
+        .cart-btn {
+            background: white;
+            border: 1px solid #e8d5c4;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            color: #3c2f2f;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8ede3;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .category-description {
+            font-size: 0.7em;
+            color: #996b4d;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f8ede3;
+            transition: background-color 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #fff9f3;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #5c4033;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .item-price {
+            color: #996b4d;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tag {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .tag-recommend {
+            background-color: #deb887;
+        }
+
+        .tag-date {
+            background-color: #b4846c;
+        }
+
+        .tag-note {
+            background-color: #a5a58d;
+            font-size: 0.7em;
+        }
+
+        .add-to-cart {
+            background: white;
+            border: 1px solid #996b4d;
+            color: #996b4d;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .menu-item:hover .add-to-cart {
+            opacity: 1;
+        }
+
+        .footer-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8ede3;
+            border-radius: 5px;
+        }
+
+        .info-section {
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #3c2f2f;
+        }
+
+        .info-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-item {
+            color: #996b4d;
+        }
+
+        .note {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #996b4d;
+            padding: 10px;
+            border-top: 1px solid #e8d5c4;
+        }
+
+        .version {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #996b4d;
+        }
+
+        /* Cart Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e8d5c4;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #996b4d;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #e8d5c4;
+            padding: 15px 0;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #5c4033;
+        }
+
+        .cart-item-price {
+            color: #996b4d;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .quantity-btn {
+            background: white;
+            border: 1px solid #996b4d;
+            color: #996b4d;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .customization-select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #e8d5c4;
+            border-radius: 4px;
+            background-color: #fff9f3;
+        }
+
+        .topping-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .topping-option {
+            background: white;
+            border: 1px solid #996b4d;
+            color: #996b4d;
+            padding: 4px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .topping-option.selected {
+            background: #996b4d;
+            color: white;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e8d5c4;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #5c4033;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #996b4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .checkout-btn:hover {
+            background: #7c563e;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .modal {
+                width: 100%;
+                max-width: none;
+            }
+
+            .category-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .item-price {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">茶湯會</div>
+            <button class="cart-btn" id="cartBtn">
+                <span>🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </header>
+
+        <div class="category">
+            <h2 class="category-title">
+                暢銷排行
+                <span class="category-description">職人調茶 誠心推薦 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">翡翠檸檬</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="翡翠檸檬" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">粉標蕎麥四季春</div>
+                <div class="price-action">
+                    <span class="item-price">$65</span>
+                    <button class="add-to-cart" data-name="粉標蕎麥四季春" data-price="65">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">觀音拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="觀音拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">紅豆拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="紅豆拿鐵/珍珠" data-price="75">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    焙茶觀音雙Q奶茶
+                    <span class="tag tag-recommend">推薦</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$80</span>
+                    <button class="add-to-cart" data-name="焙茶觀音雙Q奶茶" data-price="80">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    普洱咖啡凍奶茶
+                    <span class="tag tag-recommend">推薦</span>
+                    <span class="tag tag-note">冷熱</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$80</span>
+                    <button class="add-to-cart" data-name="普洱咖啡凍奶茶" data-price="80">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                焙茶咖啡凍系列
+                <span class="category-description">焙煎茶香 溫潤醇厚 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">
+                    觀音雙Q拿鐵
+                    <span class="tag tag-recommend">推薦</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="觀音雙Q拿鐵" data-price="75">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    焙茶拿鐵/珍珠
+                    <span class="tag tag-recommend">推薦</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$80</span>
+                    <button class="add-to-cart" data-name="焙茶拿鐵/珍珠" data-price="80">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                季節限定
+                <span class="category-description">冬季首選 暖心暖胃 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">
+                    原味薑茶
+                    <span class="tag tag-date">11/15上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$65</span>
+                    <button class="add-to-cart" data-name="原味薑茶" data-price="65">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    薑汁奶茶
+                    <span class="tag tag-date">11/15上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="薑汁奶茶" data-price="75">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    薑汁桂圓紅棗
+                    <span class="tag tag-date">11/15上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="薑汁桂圓紅棗" data-price="75">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    桂圓紅棗茶
+                    <span class="tag tag-date">11/15上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="桂圓紅棗茶" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    燕麥鐵觀音
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$45</span>
+                    <button class="add-to-cart" data-name="燕麥鐵觀音" data-price="45">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    燕麥紅茶
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$45</span>
+                    <button class="add-to-cart" data-name="燕麥紅茶" data-price="45">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    燕麥觀音拿鐵
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="燕麥觀音拿鐵" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    燕麥紅茶拿鐵
+                    <span class="tag tag-recommend">推薦</span>
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="燕麥紅茶拿鐵" data-price="70">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                蕎麥系列
+                <span class="category-description">香味獨特 清爽香醇</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">
+                    黃金蕎麥
+                    <span class="tag tag-note">無茶</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$45</span>
+                    <button class="add-to-cart" data-name="黃金蕎麥" data-price="45">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    蕎麥四季春
+                    <span class="tag tag-note">含茶</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="蕎麥四季春" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金桂蕎麥
+                    <span class="tag tag-recommend">推薦</span>
+                    <span class="tag tag-note">無茶</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="金桂蕎麥" data-price="60">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                雅韻烏龍
+                <span class="category-description">半發酵 溫潤回甘 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">碳燒鐵觀音</div>
+                <div class="price-action">
+                    <span class="item-price">$35</span>
+                    <button class="add-to-cart" data-name="碳燒鐵觀音" data-price="35">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">四季春/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$40</span>
+                    <button class="add-to-cart" data-name="四季春/珍珠" data-price="40">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">多瓜鐵觀音</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="多瓜鐵觀音" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金桂觀音
+                    <span class="tag tag-recommend">推薦</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$50</span>
+                    <button class="add-to-cart" data-name="金桂觀音" data-price="50">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">鐵觀音奶茶</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="鐵觀音奶茶" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">多瓜檸檬鐵觀音</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="多瓜檸檬鐵觀音" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">多瓜觀音拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="多瓜觀音拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">QQ檸檬四季春</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="QQ檸檬四季春" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">四季春蜂蜜拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="四季春蜂蜜拿鐵/珍珠" data-price="75">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">金桂觀音拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="金桂觀音拿鐵/珍珠" data-price="75">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                質樸普洱
+                <span class="category-description">後發酵 木質陳香 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">
+                    普洱茶
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$40</span>
+                    <button class="add-to-cart" data-name="普洱茶" data-price="40">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    普洱紅/綠/鐵
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$45</span>
+                    <button class="add-to-cart" data-name="普洱紅/綠/鐵" data-price="45">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    普洱拿鐵/珍珠
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="普洱拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    厚普洱奶茶/珍珠
+                    <span class="tag tag-recommend">推薦</span>
+                    <span class="tag tag-date">12/1上市</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$75</span>
+                    <button class="add-to-cart" data-name="厚普洱奶茶/珍珠" data-price="75">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                香醇紅茶
+                <span class="category-description">全發酵 香醇濃厚 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">
+                    蘆香紅茶
+                    <span class="tag tag-note">超人氣凍頂紅茶</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$35</span>
+                    <button class="add-to-cart" data-name="蘆香紅茶" data-price="35">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">功夫紅茶</div>
+                <div class="price-action">
+                    <span class="item-price">$40</span>
+                    <button class="add-to-cart" data-name="功夫紅茶" data-price="40">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">豆漿紅茶</div>
+                <div class="price-action">
+                    <span class="item-price">$50</span>
+                    <button class="add-to-cart" data-name="豆漿紅茶" data-price="50">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    蘆香奶茶
+                    <span class="tag tag-note">超人氣凍頂奶茶</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="蘆香奶茶" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">豆漿奶茶</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="豆漿奶茶" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">珍珠奶茶</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="珍珠奶茶" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">錫蘭烏瓦檸檬紅茶</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="錫蘭烏瓦檸檬紅茶" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">功夫茶拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="功夫茶拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">紅茶拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="紅茶拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                清爽綠茶
+                <span class="category-description">輕發酵 清爽解膩 | 含茶 22oz 16oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">特級翡翠綠</div>
+                <div class="price-action">
+                    <span class="item-price">$40</span>
+                    <button class="add-to-cart" data-name="特級翡翠綠" data-price="40">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">
+                    金桂茉莉
+                    <span class="tag tag-recommend">推薦</span>
+                </div>
+                <div class="price-action">
+                    <span class="item-price">$50</span>
+                    <button class="add-to-cart" data-name="金桂茉莉" data-price="50">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">特級茉莉奶綠</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="特級茉莉奶綠" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">珍珠特級茉莉奶綠</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="珍珠特級茉莉奶綠" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">蜂蜜綠茶</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="蜂蜜綠茶" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">百香綠茶</div>
+                <div class="price-action">
+                    <span class="item-price">$55</span>
+                    <button class="add-to-cart" data-name="百香綠茶" data-price="55">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">水果茶</div>
+                <div class="price-action">
+                    <span class="item-price">$65</span>
+                    <button class="add-to-cart" data-name="水果茶" data-price="65">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">翡翠拿鐵/珍珠</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="翡翠拿鐵/珍珠" data-price="70">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">
+                無茶也歡
+                <span class="category-description">清甜滋味 老少咸宜 | 無茶 22oz</span>
+            </h2>
+            <div class="menu-item">
+                <div class="item-name">檸檬冬瓜</div>
+                <div class="price-action">
+                    <span class="item-price">$60</span>
+                    <button class="add-to-cart" data-name="檸檬冬瓜" data-price="60">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">檸檬蜜</div>
+                <div class="price-action">
+                    <span class="item-price">$65</span>
+                    <button class="add-to-cart" data-name="檸檬蜜" data-price="65">加入</button>
+                </div>
+            </div>
+            <div class="menu-item">
+                <div class="item-name">拿鐵冬瓜</div>
+                <div class="price-action">
+                    <span class="item-price">$70</span>
+                    <button class="add-to-cart" data-name="拿鐵冬瓜" data-price="70">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <div class="info-section">
+                <div class="info-title">加料選擇</div>
+                <div class="info-content">
+                    <div class="info-item">+$10：紅豆 | 檸檬 | 麥芽晶球 | 波霸 | 珍珠</div>
+                    <div class="info-item">+$15：粉標 | 燕麥 | 咖啡凍</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">甜度選擇</div>
+                <div class="info-content">
+                    <div class="info-item">標準 | 八分糖 | 半糖 | 微糖 | 無糖</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">冰量選擇</div>
+                <div class="info-content">
+                    <div class="info-item">多冰 | 標準 | 微冰 | 去冰</div>
+                </div>
+            </div>
+
+            <div class="note">
+                拿鐵類飲品品嚐時泡沫未達滿杯為正常現象，建議開口飲用以享用最佳口感。
+            </div>
+
+            <div class="version">2024.11月N版</div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="modal" id="cartModal">
+        <div class="modal-header">
+            <h2>購物車</h2>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <span>總計</span>
+            <span id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn">結帳</button>
+    </div>
+
+    <script>
+class ShoppingCart {
+    constructor() {
+        this.items = [];
+        this.init();
+    }
+
+    init() {
+        // Initialize event listeners
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const { name, price } = e.target.dataset;
+                this.addItem({ name, price: parseInt(price) });
+            });
+        });
+
+        document.getElementById('cartBtn').addEventListener('click', () => this.openCart());
+        document.getElementById('closeModal').addEventListener('click', () => this.closeCart());
+        document.getElementById('overlay').addEventListener('click', () => this.closeCart());
+
+        // 新增結帳按鈕事件
+        document.querySelector('.checkout-btn').addEventListener('click', () => {
+            if (this.items.length === 0) {
+                alert('購物車是空的！');
+                return;
+            }
+            this.copyOrder();
+        });
+    }
+
+    addItem(item) {
+        const newItem = {
+            id: Math.random().toString(36).substr(2, 9),
+            ...item,
+            quantity: 1,
+            customizations: {
+                sugar: '標準',
+                ice: '標準',
+                toppings: []
+            }
+        };
+        this.items.push(newItem);
+        this.updateCart();
+    }
+
+    removeItem(id) {
+        this.items = this.items.filter(item => item.id !== id);
+        this.updateCart();
+    }
+
+    updateQuantity(id, delta) {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            item.quantity = Math.max(1, item.quantity + delta);
+            this.updateCart();
+        }
+    }
+
+    updateCustomization(id, type, value) {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            item.customizations[type] = value;
+            this.updateCart();
+        }
+    }
+
+    toggleTopping(id, topping) {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            const toppings = item.customizations.toppings;
+            const index = toppings.indexOf(topping);
+            if (index === -1) {
+                toppings.push(topping);
+            } else {
+                toppings.splice(index, 1);
+            }
+            this.updateCart();
+        }
+    }
+
+    calculateItemTotal(item) {
+        let total = item.price * item.quantity;
+        item.customizations.toppings.forEach(topping => {
+            const toppingPrice = ['紅豆', '檸檬', '麥芽晶球', '波霸', '珍珠'].includes(topping) ? 10 : 15;
+            total += toppingPrice * item.quantity;
+        });
+        return total;
+    }
+
+    calculateTotal() {
+        return this.items.reduce((sum, item) => sum + this.calculateItemTotal(item), 0);
+    }
+
+    updateCart() {
+        // Update cart count
+        document.getElementById('cartCount').textContent = this.items.length;
+
+        // Update cart items
+        const cartItems = document.getElementById('cartItems');
+        cartItems.innerHTML = this.items.map(item => this.renderCartItem(item)).join('');
+
+        // Update total
+        document.getElementById('cartTotal').textContent = `$${this.calculateTotal()}`;
+
+        // Add event listeners to new elements
+        this.addCartItemListeners();
+    }
+
+    renderCartItem(item) {
+        return `
+            <div class="cart-item" data-id="${item.id}">
+                <div class="cart-item-header">
+                    <span class="cart-item-name">${item.name}</span>
+                    <button class="delete-item">&times;</button>
+                </div>
+                <div class="cart-item-price">${this.calculateItemTotal(item)}</div>
+                
+                <div class="quantity-controls">
+                    <button class="quantity-btn decrease">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="quantity-btn increase">+</button>
+                </div>
+
+                <select class="customization-select sugar-select">
+                    ${['標準', '八分糖', '半糖', '微糖', '無糖']
+                        .map(sugar => `<option value="${sugar}" ${item.customizations.sugar === sugar ? 'selected' : ''}>${sugar}</option>`)
+                        .join('')}
+                </select>
+
+                <select class="customization-select ice-select">
+                    ${['多冰', '標準', '微冰', '去冰']
+                        .map(ice => `<option value="${ice}" ${item.customizations.ice === ice ? 'selected' : ''}>${ice}</option>`)
+                        .join('')}
+                </select>
+
+                <div class="topping-options">
+                    ${['紅豆', '檸檬', '麥芽晶球', '波霸', '珍珠', '粉標', '燕麥', '咖啡凍']
+                        .map(topping => `
+                            <span class="topping-option ${item.customizations.toppings.includes(topping) ? 'selected' : ''}" 
+                                  data-topping="${topping}">
+                                ${topping} ${['紅豆', '檸檬', '麥芽晶球', '波霸', '珍珠'].includes(topping) ? '+$10' : '+$15'}
+                            </span>
+                        `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    addCartItemListeners() {
+        // Add listeners for quantity buttons
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.closest('.cart-item').dataset.id;
+                const delta = e.target.classList.contains('increase') ? 1 : -1;
+                this.updateQuantity(id, delta);
+            });
+        });
+
+        // Add listeners for delete buttons
+        document.querySelectorAll('.delete-item').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.closest('.cart-item').dataset.id;
+                this.removeItem(id);
+            });
+        });
+
+        // Add listeners for customization selects
+        document.querySelectorAll('.sugar-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const id = e.target.closest('.cart-item').dataset.id;
+                this.updateCustomization(id, 'sugar', e.target.value);
+            });
+        });
+
+        document.querySelectorAll('.ice-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const id = e.target.closest('.cart-item').dataset.id;
+                this.updateCustomization(id, 'ice', e.target.value);
+            });
+        });
+
+        // Add listeners for topping options
+        document.querySelectorAll('.topping-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const id = e.target.closest('.cart-item').dataset.id;
+                const topping = e.target.dataset.topping;
+                this.toggleTopping(id, topping);
+            });
+        });
+    }
+
+    openCart() {
+        document.getElementById('cartModal').classList.add('show');
+        document.getElementById('overlay').classList.add('show');
+    }
+
+    closeCart() {
+        document.getElementById('cartModal').classList.remove('show');
+        document.getElementById('overlay').classList.remove('show');
+    }
+
+    // 新增格式化訂單方法
+    formatOrder() {
+        const date = new Date();
+        const formattedDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+        
+        let orderText = `=== 茶湯會訂單 ===\n`;
+        orderText += `訂購時間：${formattedDate}\n`;
+        orderText += `------------------\n`;
+        
+        this.items.forEach((item, index) => {
+            orderText += `${index + 1}. ${item.name}\n`;
+            orderText += `   數量：${item.quantity}\n`;
+            orderText += `   甜度：${item.customizations.sugar}\n`;
+            orderText += `   冰塊：${item.customizations.ice}\n`;
+            
+            if (item.customizations.toppings.length > 0) {
+                orderText += `   加料：${item.customizations.toppings.join('、')}\n`;
+            }
+            
+            orderText += `   小計：$${this.calculateItemTotal(item)}\n`;
+            orderText += `------------------\n`;
+        });
+        
+        orderText += `總計金額：$${this.calculateTotal()}\n`;
+        
+        return orderText;
+    }
+
+    // 新增複製訂單方法
+    async copyOrder() {
+        const orderText = this.formatOrder();
+        
+        try {
+            await navigator.clipboard.writeText(orderText);
+            alert('訂單內容已複製到剪貼板！');
+        } catch (err) {
+            const textArea = document.createElement('textarea');
+            textArea.value = orderText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('訂單內容已複製到剪貼板！');
+        }
+    }
+}
+
+// Initialize shopping cart
+const cart = new ShoppingCart();
+</script>
+</body>
+</html>
